@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MealMate Admin - 관리자 페이지</title>
+    <style>
+        :root {
+            --primary-color: #ff4757;
+            --sidebar-color: #2f3542;
+            --bg-color: #f1f2f6;
+            --kakao-color: #FEE500;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 400px;
+            max-width: 100%;
+            background: #fff;
+            box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08);
+            padding: 28px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        h2 {
+            color: var(--sidebar-color);
+            margin: 0 0 24px;
+            border-left: 5px solid var(--primary-color);
+            padding-left: 10px;
+            font-size: 1.2rem;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #57606f;
+            font-weight: 700;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dfe4ea;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #a4b0be;
+        }
+
+        textarea {
+            min-height: 84px;
+            resize: vertical;
+        }
+
+        .input-with-upload {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .input-with-upload textarea {
+            flex: 1;
+        }
+
+        .upload-btn {
+            min-width: 88px;
+            border: 1px solid #dfe4ea;
+            background: #f8f9fb;
+            color: #2f3542;
+            border-radius: 8px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0 10px;
+            white-space: nowrap;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .save-btn {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            background: var(--primary-color);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .hint {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #747d8c;
+            line-height: 1.4;
+        }
+
+        .preview-area {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 16px;
+        }
+
+        .preview-label {
+            color: #747d8c;
+            font-weight: 700;
+        }
+
+        .phone-frame {
+            width: 360px;
+            height: 740px;
+            background: #000;
+            border: 12px solid #333;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .phone-frame::before {
+            content: "";
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 20px;
+            border-radius: 14px;
+            background: #121212;
+            z-index: 5;
+        }
+
+        .app-top {
+            height: 60%;
+            background:
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.12) 45%, rgba(0, 0, 0, 0.82) 100%),
+                url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=1400') center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 20px 28px;
+            transition: background-image 0.25s;
+        }
+
+        .app-title {
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.75);
+        }
+
+        .app-title h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            line-height: 1.05;
+        }
+
+        .app-title p {
+            margin: 6px 0 0;
+            font-size: 0.82rem;
+            opacity: 0.95;
+        }
+
+        .app-bottom {
+            height: 40%;
+            background: #fff;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .food-label {
+            color: #2f3542;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .food-window {
+            height: 120px;
+            border-radius: 14px;
+            background: url('https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&q=80&w=1200') center/cover;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+            transition: background-image 0.25s;
+        }
+
+        .login-buttons {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            min-height: 48px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-google {
+            background: #fff;
+            border-color: #dfe4ea;
+            color: #2f3542;
+        }
+
+        .btn-kakao {
+            background: var(--kakao-color);
+            color: #3E1A1D;
+        }
+
+        .btn img {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (max-width: 1040px) {
+            body {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+                box-shadow: none;
+                border-bottom: 1px solid #e8ecf1;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .preview-area {
+                padding: 12px;
+            }
+
+            .phone-frame {
+                width: min(92vw, 360px);
+                height: min(78vh, 740px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <aside class="admin-sidebar">
+        <h2>MealMate 관리자 설정</h2>
+
+        <div class="control-group">
+            <label for="titleInput">앱 타이틀</label>
+            <input id="titleInput" type="text" value="모두 막방">
+        </div>
+
+        <div class="control-group">
+            <label for="sloganInput">슬로건</label>
+            <input id="sloganInput" type="text" value="join the world's warmest table">
+        </div>
+
+        <div class="control-group">
+            <label for="heroImageInput">상단 이미지 URL</label>
+            <div class="input-with-upload">
+                <textarea id="heroImageInput">https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=1400</textarea>
+                <label class="upload-btn" for="heroImageFile">파일 첨부</label>
+                <input class="file-input" id="heroImageFile" type="file" accept="image/*">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="foodImageInput">음식 이미지 URL</label>
+            <div class="input-with-upload">
+                <textarea id="foodImageInput">https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&q=80&w=1200</textarea>
+                <label class="upload-btn" for="foodImageFile">파일 첨부</label>
+                <input class="file-input" id="foodImageFile" type="file" accept="image/*">
+            </div>
+        </div>
+
+        <button class="save-btn" id="applyBtn" type="button">미리보기에 적용</button>
+        <p class="hint">입력값을 수정하고 버튼을 누르면 오른쪽 모바일 화면에 즉시 반영됩니다.</p>
+    </aside>
+
+    <main class="preview-area">
+        <div class="preview-label">앱 미리보기</div>
+        <section class="phone-frame" aria-label="MealMate 앱 미리보기">
+            <div class="app-top" id="appTop">
+                <div class="app-title">
+                    <h1 id="previewTitle">모두 막방</h1>
+                    <p id="previewSlogan">join the world's warmest table</p>
+                </div>
+            </div>
+
+            <div class="app-bottom">
+                <div class="food-label">Real-Food Window</div>
+                <div class="food-window" id="foodWindow" role="img" aria-label="떡볶이와 만두"></div>
+
+                <div class="login-buttons">
+                    <div class="btn btn-google">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google__G__Logo.svg" alt="Google">
+                        Continue with Google
+                    </div>
+                    <div class="btn btn-kakao">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/KakaoTalk_logo.svg" alt="Kakao">
+                        Sign in with Kakao
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const titleInput = document.getElementById('titleInput');
+        const sloganInput = document.getElementById('sloganInput');
+        const heroImageInput = document.getElementById('heroImageInput');
+        const foodImageInput = document.getElementById('foodImageInput');
+        const heroImageFile = document.getElementById('heroImageFile');
+        const foodImageFile = document.getElementById('foodImageFile');
+
+        const previewTitle = document.getElementById('previewTitle');
+        const previewSlogan = document.getElementById('previewSlogan');
+        const appTop = document.getElementById('appTop');
+        const foodWindow = document.getElementById('foodWindow');
+
+        let heroObjectUrl = '';
+        let foodObjectUrl = '';
+
+        const applySettings = () => {
+            const heroImage = heroImageInput.value.trim();
+            const foodImage = foodImageInput.value.trim();
+
+            previewTitle.textContent = titleInput.value.trim() || '모두 막방';
+            previewSlogan.textContent = sloganInput.value.trim() || "join the world's warmest table";
+
+            if (heroImage) {
+                appTop.style.backgroundImage =
+                    `linear-gradient(to bottom, rgba(0,0,0,0.12) 45%, rgba(0,0,0,0.82) 100%), url('${heroImage}')`;
+            }
+
+            if (foodImage) {
+                foodWindow.style.backgroundImage = `url('${foodImage}')`;
+            }
+        };
+
+        document.getElementById('applyBtn').addEventListener('click', applySettings);
+
+        heroImageFile.addEventListener('change', (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            if (heroObjectUrl) {
+                URL.revokeObjectURL(heroObjectUrl);
+            }
+
+            heroObjectUrl = URL.createObjectURL(file);
+            heroImageInput.value = heroObjectUrl;
+            applySettings();
+        });
+
+        foodImageFile.addEventListener('change', (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            if (foodObjectUrl) {
+                URL.revokeObjectURL(foodObjectUrl);
+            }
+
+            foodObjectUrl = URL.createObjectURL(file);
+            foodImageInput.value = foodObjectUrl;
+            applySettings();
+        });
+    </script>
+</body>
+</html>
