@@ -841,6 +841,29 @@
             loginStatus.classList.toggle('error', isError);
         };
 
+        const loadRuntimeGoogleClientId = async () => {
+            try {
+                const response = await fetch('/api/config', { cache: 'no-store' });
+                if (!response.ok) return '';
+
+                const runtimeConfig = await response.json();
+                const runtimeClientId = typeof runtimeConfig?.googleClientId === 'string'
+                    ? runtimeConfig.googleClientId.trim()
+                    : '';
+
+                if (!runtimeClientId) return '';
+
+                if (!googleClientIdInput.value.trim()) {
+                    googleClientIdInput.value = runtimeClientId;
+                    saveSettings();
+                }
+
+                return runtimeClientId;
+            } catch {
+                return '';
+            }
+        };
+
         const applyGoogleSession = (profile) => {
             if (!profile) return;
             const displayName = profile.name || profile.email || '사용자';
@@ -1657,7 +1680,9 @@
         handleOAuthRedirectResult();
 
         window.addEventListener('load', () => {
-            initializeGoogleAuth();
+            loadRuntimeGoogleClientId().finally(() => {
+                initializeGoogleAuth();
+            });
         });
     </script>
 </body>
